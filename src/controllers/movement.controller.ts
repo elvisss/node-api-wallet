@@ -1,7 +1,7 @@
-import { DELETE, GET, POST, PUT, route } from 'awilix-express'
+import { GET, POST, route } from 'awilix-express'
 import { Request, Response } from 'express'
 import { BaseController } from '../common/controllers/base.controller'
-import { MovementCreateDto, MovementUpdateDto } from '../dto/movement.dto'
+import { MovementCreateDto } from '../dto/movement.dto'
 import { MovementService } from '../services/movement.service'
 
 @route('/movement/')
@@ -44,32 +44,6 @@ export class MovementController extends BaseController {
       const { user_id, type, amount } = req.body
       const movementCreate: MovementCreateDto = { user_id, type, amount }
       await this.movementService.store(movementCreate)
-      res.status(201).send()
-    } catch(err) {
-      this.handleException(err, res)
-    }
-  }
-
-  @route(':id')
-  @PUT()
-  public async update(req: Request, res: Response): Promise<void> {
-    try {
-      const { id } = req.params
-      const { type, amount } = req.body
-      const movementUpdate: MovementUpdateDto = { type, amount }
-      await this.movementService.update(parseInt(id), movementUpdate)
-      res.send()
-    } catch(err) {
-      this.handleException(err, res)
-    }
-  }
-
-  @route(':id')
-  @DELETE()
-  public async remove(req: Request, res: Response): Promise<void> {
-    try {
-      const { id } = req.params
-      await this.movementService.remove(parseInt(id))
       res.send()
     } catch(err) {
       this.handleException(err, res)

@@ -1,10 +1,17 @@
+import { MovementType } from '../common/enums/movement-type'
 import { ApplicationException } from '../common/exception/application.exception'
-import { MovementCreateDto, MovementUpdateDto } from '../dto/movement.dto'
+import { BalanceCreateDto } from '../dto/balance.dto'
+import { MovementCreateDto } from '../dto/movement.dto'
+import { BalanceRepository } from './repositories/balance.repository'
+import { Balance } from './repositories/domain/balance'
 import { Movement } from './repositories/domain/movement'
 import { MovementRepository } from './repositories/movement.repository'
 
 export class MovementService {
-  constructor(private readonly movementRepository: MovementRepository) {}
+  constructor(
+    private readonly movementRepository: MovementRepository,
+    private readonly balanceRepository: BalanceRepository
+  ) {}
 
   public async find(id: number): Promise<Movement | null> {
     return await this.movementRepository.find(id)
@@ -15,29 +22,44 @@ export class MovementService {
   }
 
   public async store(entry: MovementCreateDto): Promise<void> {
-    return await this.movementRepository.store(entry as Movement)
-  }
-
-  public async update(id: number, entry: MovementUpdateDto): Promise<void> {
-    const originalEntry = await this.movementRepository.find(id)
-
-    if (!originalEntry) {
-      throw new ApplicationException('Movement not found', 404)
+    if (!Object.values(MovementType).includes(entry.type)) {
+      throw new ApplicationException('Invalid movement type supplied')
     }
 
-    originalEntry.amount = entry.amount
-    originalEntry.type = entry.type
+    const balance = await this.balanceRepository.findByUserId(entry.user_id)
 
-    await this.movementRepository.update(originalEntry)
-  }
-
-  public async remove(id: number): Promise<void> {
-    const originalEntry = await this.movementRepository.find(id)
-
-    if (!originalEntry) {
-      throw new ApplicationException('Movement not found', 404)
+    if (entry.type === MovementType.INCOME) {
+      await this.income(entry, balance)
     }
 
-    await this.movementRepository.remove(id)
+    if (entry.type === MovementType.OUTCOME) {
+      await this.outcome(entry, balance)
+    }
+  }
+
+  private async income(entry: MovementCreateDto, balance: Balance | null) {
+    if (!balance) {
+      const balanceCreate: BalanceCreateDto = {
+        user_id: entry.user_id,
+        amount: entry.amount,
+      }
+      await this.balanceRepository.store(balanceCreate as Balance)
+    } else {
+      balance.amount += entry.amount
+      await this.balanceRepository.update(balance)
+    }
+
+    await this.movementRepository.store(entry as Movement)
+  }
+
+  private async outcome(entry: MovementCreateDto, balance: Balance | null) {
+    if (!balance || balance.amount < entry.amount) {
+      throw new ApplicationException('User does not have enough balance')
+    }
+
+    balance.amount -= entry.amount
+
+    await this.balanceRepository.update(balance)
+    await this.movementRepository.store(entry as Movement)
   }
 }
