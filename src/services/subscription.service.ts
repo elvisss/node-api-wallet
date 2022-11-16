@@ -36,7 +36,7 @@ export class SubscriptionService {
     const originalEntry = await this.subscriptionRepository.find(id)
 
     if (!originalEntry) {
-      throw new ApplicationException('Subscription not found')
+      throw new ApplicationException('Subscription not found', 404)
     }
 
     originalEntry.code = entry.code
@@ -47,6 +47,12 @@ export class SubscriptionService {
   }
 
   public async remove(id: number): Promise<void> {
+    const originalEntry = await this.subscriptionRepository.find(id)
+
+    if (!originalEntry) {
+      throw new ApplicationException('Subscription not found', 404)
+    }
+
     await this.subscriptionRepository.remove(id)
   }
 }
