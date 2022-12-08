@@ -24,7 +24,7 @@ export class MySQLSubscriptionRepository implements SubscriptionRepository {
     return rows[0] as Subscription
   }
 
-  public async findByUserAndCode(user_id: number, code: string): Promise<Subscription | null> {
+  public async findByUserIdAndCode(user_id: number, code: string): Promise<Subscription | null> {
     const [rows]: any[] = await connector.execute(
       'SELECT * FROM subscription WHERE user_id = ? AND code = ?',
       [user_id, code]
