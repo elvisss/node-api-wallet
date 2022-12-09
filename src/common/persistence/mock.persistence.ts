@@ -17,7 +17,7 @@ const db = {
     },
   ],
   movement: [],
-  subcription: [],
+  subscription: [],
   _balanceId: 0,
   _movementId: 0,
   _subscriptionId: 0,

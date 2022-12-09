@@ -9,7 +9,7 @@
     "dev": "nodemon src/server.ts --exec ts-node",
     "lint": "eslint src/*",
     "lintfix": "eslint src/* --fix",
-    "test": "mocha -r ts-node/register src/test/**/*.spec.ts"
+    "test": "mocha -r ts-node/register src/tests/**/*.spec.ts"
   },
   "keywords": [],
   "author": "",
