@@ -3,10 +3,13 @@ import { loadControllers } from 'awilix-express'
 import loadContainer from './container'
 import { config } from '../config'
 import { expressjwt } from 'express-jwt'
+import cors from 'cors'
 
 const app: Application = express()
 
 app.use(express.json())
+app.use(cors())
+
 loadContainer(app)
 
 app.use(
