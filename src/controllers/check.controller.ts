@@ -10,4 +10,10 @@ export class CheckController {
       APP_ENV: process.env.APP_ENV,
     })
   }
+
+  @route('/user-payload')
+  @GET()
+  public userPayload(req: any, res: Response): void {
+    res.send(req.auth)
+  }
 }

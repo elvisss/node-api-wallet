@@ -16,4 +16,5 @@ export const config = {
   dbMssqlPort: Number(process.env.DB_MSSQL_PORT) || 3306,
   dbMssqlUser: process.env.DB_MSSQL_USER || '',
   dbMssqlPassword: process.env.DB_MSSQL_PASSWORD || '',
+  jwtSecretKey: process.env.JWT_SECRET_KEY || ''
 }
